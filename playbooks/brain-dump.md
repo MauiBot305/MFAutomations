@@ -98,16 +98,24 @@ Complex (orchestration, QA)       →  💎 Premium (Opus) — USE SPARINGLY
 | 💎 Premium | ~$0.50-1.00 | Only orchestration + final QA |
 
 ### Token Budget Per Phase
-| Phase | Budget | Alert At | Pause At |
-|-------|--------|----------|----------|
-| Decompose | 50k | 40k | 50k |
-| Research | 200k | 150k | 200k |
-| Document | 150k | 120k | 150k |
-| Integrate | 50k | 40k | 50k |
-| Validate | 50k | 40k | 50k |
-| **TOTAL** | **500k** | **390k** | **500k** |
+| Phase | Budget | Alert At |
+|-------|--------|----------|
+| Decompose | 50k | 40k |
+| Research | 200k | 150k |
+| Document | 150k | 120k |
+| Integrate | 50k | 40k |
+| Validate | 50k | 40k |
+| **TOTAL** | **500k** | **390k** |
 
-If approaching budget: **pause and ask human before continuing.**
+**NO PAUSES** — Alert at threshold, keep going. Only stop if human explicitly says stop.
+
+### Default Worker Model
+
+**Gemini 3 Pro (`gemini`)** is the default for all worker agents unless the orchestrator explicitly assigns a different model.
+
+- Orchestrator runs on Opus (complex coordination)
+- Workers default to Gemini 3 Pro (cost-effective, good quality)
+- Orchestrator CAN override and assign Sonnet/Haiku/etc. when needed
 
 ### Before Any Task
 1. ✅ Check existing RAG — don't re-learn what we know
@@ -410,14 +418,18 @@ Any of these will start the Brain Dump process:
 
 ## Summary: Model Routing Per Phase
 
-| Phase | Orchestrator | Heavy Tasks | Light Tasks |
-|-------|--------------|-------------|-------------|
+**Default Worker Model: Gemini 3 Pro (`gemini`)**
+
+Orchestrator can override when needed.
+
+| Phase | Orchestrator | Default Workers | Override When |
+|-------|--------------|-----------------|---------------|
 | 1. Capture | — | — | — |
-| 2. Decompose | 💎 Opus | 🔷 Sonnet | 🟢 Haiku |
-| 3. Research | 💎 Opus | 🔷 Sonnet/GPT-5.2 | 🟢 Gemini Flash |
-| 4. Document | 💎 Opus | 🔷 Sonnet | 🟢 Haiku |
-| 5. Integrate | 💎 Opus | 🟢 Haiku | 🟢 Gemini Flash |
-| 6. Validate | 💎 Opus | 🔷 Sonnet | — |
+| 2. Decompose | 💎 Opus | 🔷 Gemini Pro | Complex logic → Sonnet |
+| 3. Research | 💎 Opus | 🔷 Gemini Pro | Deep synthesis → Sonnet |
+| 4. Document | 💎 Opus | 🔷 Gemini Pro | Technical writing → Sonnet |
+| 5. Integrate | 💎 Opus | 🔷 Gemini Pro | Simple tasks → Gemini Flash |
+| 6. Validate | 💎 Opus | 🔷 Gemini Pro | Final QA → Sonnet |
 
 ---
 
