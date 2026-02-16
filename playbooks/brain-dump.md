@@ -2,7 +2,7 @@
 
 ### A Systematic Process for Teaching AI New Subjects
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Created:** February 16, 2026  
 **Updated:** February 16, 2026  
 **Authors:** Patrick Chinery, Maui  
@@ -36,7 +36,111 @@ Brain Dump ONLY produces:
 
 **Every single subtopic gets EXPERT MASTERY treatment. No exceptions.**
 
-If the knowledge coming into the RAG isn't at mastery level, it doesn't belong there.
+---
+
+## ⚡ TOKEN CONSCIOUSNESS
+
+Brain Dump achieves EXPERT MASTERY while being cost-efficient.
+
+### Available Cloud Models (API)
+
+The orchestrator has access to these models and should route tasks to the cheapest capable option:
+
+#### Anthropic
+| Model | Alias | Tier | Best For |
+|-------|-------|------|----------|
+| claude-opus-4-6 | `opus` | 💎 Premium | Complex reasoning, final QA, orchestration |
+| claude-opus-4-5 | — | 💎 Premium | Complex reasoning, orchestration |
+| claude-sonnet-4-5 | `sonnet` | 🔷 Mid | Research, synthesis, writing |
+| claude-haiku-4-5 | — | 🟢 Budget | Simple tasks, formatting, chunking |
+
+#### OpenAI
+| Model | Alias | Tier | Best For |
+|-------|-------|------|----------|
+| gpt-5.3-codex | — | 💎 Premium | Code generation |
+| gpt-5.3-codex-spark | — | 💎 Premium | Code with creativity |
+| gpt-5.2-pro | — | 💎 Premium | Complex reasoning |
+| gpt-5.2 | `gpt` | 🔷 Mid | General tasks |
+| gpt-5.1 | — | 🔷 Mid | General tasks |
+| gpt-5 | — | 🔷 Mid | General tasks |
+| gpt-5.2-codex | — | 🔷 Mid | Code tasks |
+| gpt-4o | — | 🟢 Budget | Simple tasks, fast |
+
+#### Google
+| Model | Alias | Tier | Best For |
+|-------|-------|------|----------|
+| gemini-3-pro-preview | `gemini` | 🔷 Mid | Research, long context |
+| gemini-2.5-pro | — | 🔷 Mid | General tasks |
+| gemini-3-flash-preview | `gemini-flash` | 🟢 Budget | Fast, cheap, simple tasks |
+| gemini-2.5-flash | — | 🟢 Budget | Fast, simple tasks |
+| gemini-1.5-pro | — | 🟢 Budget | Long context, cheap |
+
+#### Other
+| Model | Alias | Tier | Best For |
+|-------|-------|------|----------|
+| kimi-coding/k2p5 | `Kimi K2.5` | 🔷 Mid | Coding tasks |
+
+### Routing Rules
+
+```
+TASK COMPLEXITY          →  MODEL TIER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Simple (formatting, chunking)     →  🟢 Budget (Haiku, GPT-4o, Gemini Flash)
+Medium (research, writing)        →  🔷 Mid (Sonnet, GPT-5.2, Gemini Pro)
+Complex (orchestration, QA)       →  💎 Premium (Opus) — USE SPARINGLY
+```
+
+### Cost Tiers (Approximate)
+| Tier | Cost/Run | When to Use |
+|------|----------|-------------|
+| 🟢 Budget | ~$0.01-0.05 | Default for most tasks |
+| 🔷 Mid | ~$0.10-0.20 | When quality matters |
+| 💎 Premium | ~$0.50-1.00 | Only orchestration + final QA |
+
+### Token Budget Per Phase
+| Phase | Budget | Alert At | Pause At |
+|-------|--------|----------|----------|
+| Decompose | 50k | 40k | 50k |
+| Research | 200k | 150k | 200k |
+| Document | 150k | 120k | 150k |
+| Integrate | 50k | 40k | 50k |
+| Validate | 50k | 40k | 50k |
+| **TOTAL** | **500k** | **390k** | **500k** |
+
+If approaching budget: **pause and ask human before continuing.**
+
+### Before Any Task
+1. ✅ Check existing RAG — don't re-learn what we know
+2. ✅ Check if another agent covered it — no duplicates
+3. ✅ Route to cheapest capable model
+4. ✅ Batch related tasks when possible
+
+---
+
+## 🗂️ RAG REGISTRY REQUIREMENT
+
+**MANDATORY: Update the RAG Registry every time new knowledge is added.**
+
+After ANY Brain Dump (or any phase that adds to the RAG):
+
+1. Update `memory/rag-registry.md` with:
+   - New branch name
+   - What it contains
+   - Routing keywords
+   - Size/document count
+   
+2. No exceptions — if it's not in the registry, it can't be found.
+
+3. Registry format:
+```markdown
+## [Branch Name]
+- **Purpose:** What this knowledge covers
+- **Location:** Path on Frank
+- **Documents:** Count
+- **Keywords:** routing, keywords, for, queries
+- **Created:** Date
+- **Brain Dump:** Name of the Brain Dump that created it
+```
 
 ---
 
@@ -56,19 +160,10 @@ Any of these will start the Brain Dump process:
 | What | Where | Access |
 |------|-------|--------|
 | **Playbooks/Workflows** | GitHub: `MFAutomations` | Patrick, Adrien (BirdDigital), Maui |
-| **Playbooks/Workflows (mirror)** | Frank: `/Users/adrienbird/MFAutomations/` | Frank, Maui, Adrien's machines |
+| **Playbooks/Workflows (mirror)** | Frank: `/Users/motherfuckingpatrick/MFAutomations/` | Frank, Maui, Adrien's machines |
 | **Knowledge Bases & RAGs** | Frank: `/Users/adrienbird/knowledge/` | Frank, Maui, Adrien's machines |
+| **RAG Registry** | `memory/rag-registry.md` | All agents |
 | **Backups & Archives** | NAS: `192.168.0.251:/shared/backups/` | Everyone on network |
-
----
-
-## Agent Model Reference
-
-| Model | Role | Use Case |
-|-------|------|----------|
-| **Opus 4.5** | Orchestrator / Heavy lifting | Coordination, complex synthesis, quality control |
-| **Sonnet 4.5** | Main subtopic research | Deep research on specific areas |
-| **Haiku 4.5** | Granular breakdown | Small chunks, simple tasks, parallel volume |
 
 ---
 
@@ -105,9 +200,8 @@ Any of these will start the Brain Dump process:
 **Purpose:** Break the topic into learnable chunks
 
 ### Agent Structure:
-- 1 Opus 4.5 orchestrator
-- Sonnet 4.5 subagents (one per main subtopic)
-- Haiku 4.5 sub-subagents (for further breakdown)
+- 1 Opus orchestrator (💎 Premium — justified for coordination)
+- Route subtasks to 🟢 Budget or 🔷 Mid models
 
 ### What Happens:
 
@@ -117,7 +211,7 @@ Any of these will start the Brain Dump process:
 2. **Difficulty-based decomposition**
    - If any subtask is **≥4/10 difficulty** to learn, break it down further
    - Continue until every chunk is **<4/10 difficulty**
-   - Assign Haiku 4.5 subagent to each granular chunk
+   - Assign tasks to cheapest capable model
 
 3. **Resource priority**
    - Focus on **FREE** knowledge sources
@@ -128,22 +222,19 @@ Any of these will start the Brain Dump process:
 
 5. **Define success criteria**
    - "How do I know I've achieved EXPERT MASTERY?"
-   - Must be able to answer expert-level questions
-   - Must understand edge cases and nuances
-   - Must know what professionals know
 
 6. **Depth level**
    - Always **EXPERT MASTERY** (not negotiable)
-   - Not "high knowledge" — MASTERY
-   - The standard: "Could I teach this to a professional?"
 
-7. **Estimate scope**
+7. **Estimate scope & cost**
    - How many files/documents will this produce?
+   - Estimated token budget
 
 ### Output:
 - List of subtopics to research (each to MASTERY level)
 - Learning sequence (what order to tackle them)
-- Clear definition of "finished/done" at MASTERY level
+- Model assignments (which model handles what)
+- Estimated token cost
 
 ---
 
@@ -152,45 +243,46 @@ Any of these will start the Brain Dump process:
 **Purpose:** Find and consume all available knowledge to EXPERT MASTERY level
 
 ### Agent Structure:
-- 1 Opus 4.5 orchestrator
-- Sonnet 4.5 subagents (one per main subtopic)
-- Haiku 4.5 sub-subagents (for further breakdown)
+- 1 Opus orchestrator (💎 Premium)
+- Route research tasks to 🔷 Mid models (Sonnet, GPT-5.2, Gemini Pro)
+- Route simple lookups to 🟢 Budget models
 
 ### What Happens:
 
-1. **Decomposition (same rules as Phase 2)**
+1. **Check existing RAG first**
+   - Don't research what we already know
+   - Build on existing knowledge
+
+2. **Decomposition (same rules as Phase 2)**
    - Break into manageable subtopic list
    - If ≥4/10 difficulty, break down until <4/10
 
-2. **⚠️ Establish Dependencies**
+3. **⚠️ Establish Dependencies**
    - Agents run in **parallel WHERE POSSIBLE**
    - Some must **wait for others to finish** (learning order matters)
    - Orchestrator manages the dependency graph
-   - Prerequisites must complete before dependent topics begin
 
-3. **Resource Priority**
+4. **Resource Priority**
    - Focus on **FREE** knowledge sources
    - Note paid access costs (for reference only)
 
-4. **Research Sources (MASTERY-LEVEL ONLY)**
+5. **Research Sources (MASTERY-LEVEL ONLY)**
    - Free courses (Harvard, MIT, Stanford, Coursera free tier, YouTube)
    - Free textbooks / PDFs — focus on authoritative sources
-   - Professional certifications to target (GIA, bar exam, etc.)
+   - Professional certifications to target
    - Practice materials, exercises, sample tests — including HARD ones
-   - Industry-standard tools and terminology
-   - **Expert-level content** — not beginner tutorials
-   - **Edge cases and exceptions** — what trips up non-experts
-   - **Real-world applications** — how practitioners actually use this
+   - Expert-level content — not beginner tutorials
 
-5. **Parallel Research**
-   - Each subagent researches assigned subtopic to MASTERY
-   - Respects dependency graph
-   - **Quality bar: Expert Mastery or it doesn't go in**
+6. **Parallel Research with Smart Routing**
+   - 🔷 Mid models do the heavy research
+   - 🟢 Budget models handle formatting, summarizing
+   - 💎 Premium only for orchestration
 
 ### Output:
 - Organized list of MASTERY-level resources per subtopic
 - Prioritized by quality/relevance/depth
 - Downloaded/saved where possible
+- Token usage report
 
 ---
 
@@ -199,11 +291,9 @@ Any of these will start the Brain Dump process:
 **Purpose:** Turn research into structured, EXPERT MASTERY knowledge
 
 ### Agent Structure:
-- 1 Opus 4.5 orchestrator
-- 3 Opus 4.5 subagents
-- 4 Sonnet 4.5 subagents per Opus subagent (12 Sonnet total)
-
-**Total: 4 Opus + 12 Sonnet = 16 agents**
+- 1 Opus orchestrator (💎 Premium)
+- 🔷 Mid models for writing (Sonnet, GPT-5.2)
+- 🟢 Budget models for formatting, cross-linking
 
 ### Goal:
 **Insanely well organized, RAG-ready, EXPERT MASTERY content**
@@ -211,36 +301,27 @@ Any of these will start the Brain Dump process:
 ### What Happens:
 
 1. Write **README.md** with full curriculum overview
-   - Must reflect MASTERY-level depth
 
 2. Create **subtopic files** (one per area)
    - Each file is EXPERT MASTERY level
-   - Not summaries — comprehensive mastery content
 
 3. Include **practical exercises and examples**
    - Include HARD examples, not just easy ones
-   - Real-world scenarios experts face
 
 4. Add **assessment questions**
    - Expert-level questions, not basic recall
-   - "Can I answer these at a MASTERY level?"
-   - Include edge cases and trick questions
 
 5. Use **consistent formatting** across all files
 
 6. **Cross-link related topics**
-   - Show how expert knowledge connects
 
 7. **Include what separates experts from amateurs**
-   - Common mistakes
-   - Nuances professionals know
-   - "Insider" knowledge
 
 ### Output:
 - Complete documentation in markdown at EXPERT MASTERY level
 - Structured for easy reference
 - Ready for RAG ingestion
-- **No surface-level content — MASTERY only**
+- Token usage report
 
 ---
 
@@ -249,14 +330,8 @@ Any of these will start the Brain Dump process:
 **Purpose:** Load EXPERT MASTERY knowledge into systems for actual use
 
 ### Agent Structure:
-- 1 Opus 4.5 orchestrator
-- 3 Opus 4.5 subagents
-- 4 Sonnet 4.5 subagents per Opus subagent (12 Sonnet total)
-
-**Total: 4 Opus + 12 Sonnet = 16 agents**
-
-### Goal:
-**Insanely well organized, RAG-ready, EXPERT MASTERY knowledge base**
+- 1 Opus orchestrator (💎 Premium)
+- 🟢 Budget models for embedding, indexing
 
 ### What Happens:
 
@@ -265,20 +340,21 @@ Any of these will start the Brain Dump process:
 2. **Generate embeddings** for semantic search
 
 3. Update **MEMORY.md** with key learnings summary
-   - Note this is MASTERY-level knowledge
 
 4. Create **skill file** if appropriate (for OpenClaw skills)
 
-5. **Register in RAG registry** (per standing rule)
-   - Tag as EXPERT MASTERY level
+5. **🗂️ UPDATE RAG REGISTRY** (MANDATORY)
+   - Add new branch to `memory/rag-registry.md`
+   - Include: purpose, location, doc count, keywords, date
 
 6. **Verify search/retrieval works**
-   - Test with EXPERT-level queries, not basic ones
+   - Test with EXPERT-level queries
 
 ### Output:
 - EXPERT MASTERY knowledge searchable via RAG
 - Memory updated
-- Registered and tracked as MASTERY-level content
+- **RAG Registry updated** ✅
+- Registered and tracked
 
 ---
 
@@ -287,41 +363,34 @@ Any of these will start the Brain Dump process:
 **Purpose:** Confirm EXPERT MASTERY knowledge was captured correctly
 
 ### Agent Structure:
-- 1 Opus 4.5 orchestrator
-- 3 Opus 4.5 subagents
-- 4 Sonnet 4.5 subagents per Opus subagent (12 Sonnet total)
-
-**Total: 4 Opus + 12 Sonnet = 16 agents**
+- 1 Opus orchestrator (💎 Premium)
+- 🔷 Mid models for gap analysis (Sonnet)
 
 ### What Happens:
 
-1. **Show summary** of what was created (files, RAG entries, etc.)
+1. **Show summary** of what was created (files, RAG entries, tokens used, cost)
 
 2. **Run test queries** against RAG to verify retrieval
    - Use EXPERT-level queries
    - Test edge cases
-   - Verify depth of answers
 
 3. **Ask human:**
    - "Did I miss anything?"
    - "Ask me 3-4 EXPERT-LEVEL questions about this topic"
-   - "Test me on the hard stuff, not the basics"
 
 4. **Gap Analysis:**
    - Look at real-world use cases EXPERTS would have
    - Test if RAG can answer EXPERT-level questions
-   - Check for missing nuances, edge cases, exceptions
-   - **If gaps found → go back to school and add MASTERY-level content to RAG**
+   - **If gaps found → go back to school and add to RAG**
 
 5. **Mastery Verification:**
    - Could this content pass a professional certification exam?
    - Could this content teach a professional something new?
-   - Are the edge cases and exceptions covered?
-   - **If NO to any → not done yet**
+   - **If NO → not done yet**
 
-6. **Allow edits/additions** if needed
+6. **Verify RAG Registry is updated**
 
-7. **Confirm completion** — at MASTERY level
+7. **Confirm completion**
 
 8. **Archive/backup to NAS**
 
@@ -331,22 +400,24 @@ Any of these will start the Brain Dump process:
   - **Name** of this Brain Dump
   - **Where** it lives in RAG
   - **Branches** of knowledge it contains
-  - **Mastery level achieved**
+  - **RAG Registry entry** confirmed
+  - **Total tokens used**
+  - **Total cost**
 - Backup created
 - Brain Dump marked **COMPLETE — EXPERT MASTERY**
 
 ---
 
-## Summary: Agent Totals Per Phase
+## Summary: Model Routing Per Phase
 
-| Phase | Opus 4.5 | Sonnet 4.5 | Haiku 4.5 |
-|-------|----------|------------|-----------|
+| Phase | Orchestrator | Heavy Tasks | Light Tasks |
+|-------|--------------|-------------|-------------|
 | 1. Capture | — | — | — |
-| 2. Decompose | 1 | As needed | As needed |
-| 3. Research | 1 | As needed | As needed |
-| 4. Document | 4 | 12 | — |
-| 5. Integrate | 4 | 12 | — |
-| 6. Validate | 4 | 12 | — |
+| 2. Decompose | 💎 Opus | 🔷 Sonnet | 🟢 Haiku |
+| 3. Research | 💎 Opus | 🔷 Sonnet/GPT-5.2 | 🟢 Gemini Flash |
+| 4. Document | 💎 Opus | 🔷 Sonnet | 🟢 Haiku |
+| 5. Integrate | 💎 Opus | 🟢 Haiku | 🟢 Gemini Flash |
+| 6. Validate | 💎 Opus | 🔷 Sonnet | — |
 
 ---
 
@@ -363,12 +434,6 @@ Any of these will start the Brain Dump process:
 | Expert | ❌ ALMOST — but not enough |
 | **EXPERT MASTERY** | ✅ YES — this is the standard |
 
-The only acceptable output is knowledge at a level where:
-- You could pass the hardest professional certification
-- You could teach experts something new
-- You know the edge cases, exceptions, and nuances
-- You understand what separates masters from amateurs
-
 ---
 
 ## Quick Start
@@ -377,24 +442,31 @@ When you want to Brain Dump a new topic:
 
 1. Say: **"Brain Dump: [topic]"**
 2. Answer the 3 capture questions
-3. Let the swarm work
+3. Let the swarm work (token-conscious routing)
 4. Review and validate at MASTERY level
-5. Done — EXPERT MASTERY knowledge is in RAG
+5. Confirm RAG Registry is updated
+6. Done — EXPERT MASTERY knowledge is in RAG
 
 ---
 
 ## Changelog
 
+### v1.2 (February 16, 2026)
+- Added TOKEN CONSCIOUSNESS section with full model inventory
+- Added model routing rules (Budget → Mid → Premium)
+- Added token budgets per phase
+- Added RAG REGISTRY REQUIREMENT (mandatory updates)
+- Updated all phases with model routing guidance
+- Added cost tracking to outputs
+
 ### v1.1 (February 16, 2026)
 - Added CORE PRINCIPLE section emphasizing EXPERT MASTERY
 - Updated all phases to explicitly require MASTERY-level content
 - Added Quality Standard Reminder section
-- Clarified that "high knowledge" is NOT enough — must be MASTERY
-- Added mastery verification step to Phase 6
 
 ### v1.0 (February 16, 2026)
 - Initial release
 
 ---
 
-**End of Brain Dump v1.1**
+**End of Brain Dump v1.2**
